@@ -3,4 +3,4 @@ gin-config
 t5
 t5x
 six
-flax==0.5
+flax

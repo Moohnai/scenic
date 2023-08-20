@@ -1,0 +1,10 @@
+scenic/__pycache__/
+scenic/dataset_lib/__pycache__/
+scenic/model_lib/__pycache__/
+scenic/model_lib/base_models/__pycache__/
+scenic/model_lib/layers/__pycache__/
+scenic/projects/__pycache__/
+scenic/projects/baselines/__pycache__/
+scenic/projects/t5/__pycache__/
+scenic/projects/vid2seq/__pycache__/
+scenic/projects/vid2seq/datasets/__pycache__/

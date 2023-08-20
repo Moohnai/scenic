@@ -150,7 +150,7 @@ def get_config(runlocal=''):
   config.l2_decay_factor = 0.
   config.max_grad_norm = 1.
   config.label_smoothing = 0.1
-  epochs = ml_collections.config_dict.FieldReference(40)
+  epochs = ml_collections.config_dict.FieldReference(0) #40
   config.num_training_epochs = epochs
   batch_size = ml_collections.config_dict.FieldReference(32)
   config.batch_size = 8 if runlocal else batch_size  # 128  # Minimum is num_devices = 32
