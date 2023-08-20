@@ -3,7 +3,7 @@
 import copy
 import os
 import re
-from typing import List, Mapping, Optional, Union, Any
+from typing import List, Mapping, Optional, Union, Any, Tuple
 
 from absl import logging
 import flax
@@ -13,12 +13,82 @@ import jax
 import jax.numpy as jnp
 import ml_collections
 from scenic.common_lib import debug_utils
-from scenic.train_lib_deprecated.pretrain_utils import get_params_and_model_state_dict
-from scenic.train_lib_deprecated.pretrain_utils import inspect_params
-from scenic.train_lib_deprecated.train_utils import TrainState
+from scenic.train_lib import train_utils
+# from scenic.train_lib_deprecated.pretrain_utils import get_params_and_model_state_dict
+# from scenic.train_lib_deprecated.pretrain_utils import inspect_params
+# from scenic.train_lib_deprecated.train_utils import TrainState
 from tensorflow.io import gfile
 
 PyTree = Union[Mapping[str, Mapping], Any]
+
+def get_params_and_model_state_dict(
+    restored_train_state: Union[PyTree, train_utils.TrainState],
+) -> Tuple[PyTree, Optional[PyTree]]:
+  """Restores the params and model state.
+
+  This function also applies the conversion needed for pre-Linen checkpoints.
+
+  Args:
+    restored_train_state: A dictionary that contains a check-pointed TrainState.
+
+  Returns:
+    A tuple of restored params and restored models state. Note that these are
+    not frozen, and need to be frozen before passing them to the optimizer.
+  """
+  restored_params = restored_train_state['optimizer']['target']
+  restored_model_state = restored_train_state.get('model_state')
+  if 'params' in restored_params:  # Backward compatibility.
+    restored_params = restored_params['params']
+    restored_params = dict(checkpoints.convert_pre_linen(restored_params))
+    if restored_model_state:
+      restored_model_state = checkpoints.convert_pre_linen(
+          flax.traverse_util.unflatten_dict({
+              tuple(k.split('/')[1:]): v
+              for k, v in restored_model_state.items()
+          }))
+  return restored_params, restored_model_state
+
+
+
+
+def inspect_params(*,
+                   expected_params: PyTree,
+                   restored_params: PyTree,
+                   fail_if_extra: bool = True,
+                   fail_if_missing: bool = True,
+                   fail_if_shapes_mismatch: bool = False) -> PyTree:
+  """Inspects whether the params are consistent with the expected keys."""
+
+
+
+
+
+
+@flax.struct.dataclass
+class TrainState:
+  """Dataclass to keep track of state of training.
+
+  The state of training is structured as a flax.struct.dataclass, which enables
+  instances of this class to be passed into jax transformations like tree_map
+  and pmap.
+  """
+  global_step: Optional[int] = 0
+  optimizer: Optional[Any] = None
+  model_state: Optional[Any] = None
+  rng: Optional[jnp.ndarray] = None
+  accum_train_time: Optional[int] = 0
+
+  def __getitem__(self, item):
+    """Make TrainState a subscriptable object."""
+    return getattr(self, item)
+
+  def get(self, keyname: str, default: Optional[Any] = None) -> Any:
+    """Return the value for key if it exists otherwise the default."""
+    try:
+      return self[keyname]
+    except KeyError:
+      return default
+
 
 
 def init_from_pretrain_weights(

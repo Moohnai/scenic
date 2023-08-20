@@ -8,3 +8,10 @@ scenic/projects/baselines/__pycache__/
 scenic/projects/t5/__pycache__/
 scenic/projects/vid2seq/__pycache__/
 scenic/projects/vid2seq/datasets/__pycache__/
+scenic/projects/vivit/__pycache__/
+scenic/projects/vivit/data/__pycache__/
+scenic/train_lib/__pycache__/
+build/
+scenic.egg-info/
+scenic/common_lib/__pycache__/
+scenic/projects/vid2seq/configs/__pycache__/

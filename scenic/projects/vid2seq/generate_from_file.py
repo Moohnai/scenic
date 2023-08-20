@@ -25,8 +25,8 @@ import pandas as pd
 import tensorflow as tf
 from tqdm import tqdm
 
-flags.DEFINE_string("csv_path", None, "Input csv")
-flags.DEFINE_string("output_path", None, "Tfrecords output path.")
+flags.DEFINE_string("csv_path", "/home/mona/scenic/scenic/projects/vid2seq/data/youcook2/youcookii_segments_inf.csv", "Input csv")
+flags.DEFINE_string("output_path", "/home/mona/scenic/scenic/projects/vid2seq/data/youcook2/", "Tfrecords output path.")
 flags.DEFINE_string(
     "features_path",
     None,
@@ -146,7 +146,7 @@ def generate_sequence_example(video_id: str,
   return seq_example
 
 
-def main():
+def main(argv):
   # reads the input csv.
   input_csv = pd.read_csv(FLAGS.csv_path)
   if FLAGS.num_shards == -1:
@@ -186,7 +186,7 @@ def main():
       asr_string = input_csv["asr_string"].values[i]
       if isinstance(asr_string, str):
         asr_string = eval(asr_string)  # pylint:disable=eval-used
-      video_id = input_csv["video_id"].values[i]
+      video_id = eval(input_csv["video_id"].values[i])[0]
       split = None
       if "split" in input_csv:
         split = input_csv["split"].values[i]
@@ -199,7 +199,7 @@ def main():
         )
       else:
         features = eval(input_csv["features"].values[i])  # pylint:disable=eval-used
-      duration = int(input_csv["duration"].values[i])
+      duration = eval(input_csv["duration"].values[i])[0]
       seq_ex = generate_sequence_example(
           video_id,
           start,

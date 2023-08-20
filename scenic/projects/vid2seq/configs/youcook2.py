@@ -38,7 +38,7 @@ def get_config(runlocal=''):
 
   config.data_dtype_str = 'float32'
 
-  config.dataset_configs.base_dir = '/path/to/youcook'
+  config.dataset_configs.base_dir = '/home/mona/scenic/scenic/projects/vid2seq/data/youcook2/'
   config.dataset_configs.tables = {
       'train': 'train.tfrecord.sst@64',
       'validation': 'val.tfrecord.sst@64',
@@ -69,6 +69,7 @@ def get_config(runlocal=''):
   config.dataset_configs.max_num_input_words = 1000
   config.dataset_configs.tokenizer = ml_collections.ConfigDict()
   config.dataset_configs.tokenizer.tokenizer_type = 'sentence_piece'
+  config.dataset_configs.tokenizer.tokenizer_model = "/home/mona/scenic/scenic/projects/vid2seq/pretrain_models/sentencepiece.model"
   config.dataset_configs.caption_string = 'caption/string'
   config.dataset_configs.train_caption_string = 'caption/string'
   config.dataset_configs.input_timestamp_name = 'video/timestamps'

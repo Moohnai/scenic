@@ -8,8 +8,8 @@ import ml_collections
 # add scenic to path
 import sys
 sys.path.append("/home/mona/scenic")
-sys.path.append("/home/mona/dmvr")
-sys.path.append("/home/mona/CLIP")
+sys.path.append("/home/mona/scenic/simclr")
+# sys.path.append("/home/mona/CLIP")
 from scenic import app
 from scenic.projects.vid2seq import models
 from scenic.projects.vid2seq import trainer
@@ -35,7 +35,7 @@ def get_model_cls(model_name: str) -> Callable[..., Any]:
 
 def main(rng: jnp.ndarray, writer: metric_writers.MetricWriter, config:ml_collections.ConfigDict = get_config, workdir: str = "./"): 
   """Main function for the Vid2Seq project."""
-  jave_jre = JRE_BIN_JAVA
+  java_jre = JRE_BIN_JAVA
   os.environ['JRE_BIN_JAVA'] = java_jre
 
   # ensure arguments match

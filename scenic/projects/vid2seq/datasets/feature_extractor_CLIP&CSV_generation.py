@@ -82,14 +82,14 @@ sentence_list = []
 segments_info = segs['database']['0O4bxhpFX9o']['annotations']
 for id in range(0,len(segments_info)):
     start = segments_info[id]['segment'][0]
-    start_time_list.append(start)
+    start_time_list.append([start])
     end = segments_info[id]['segment'][1]
-    end_time_list.append(end)
+    end_time_list.append([end])
     duration = end - start
-    duration_list.append(duration)
+    duration_list.append([duration])
     id_list.append(id)
     sentence = segments_info[id]['sentence']
-    sentence_list.append(sentence)
+    sentence_list.append([sentence])
 
 
 print('Loading CLIP model')
@@ -137,16 +137,22 @@ asr_string_list = []
 asr_start_list = []
 asr_end_list = []
 for i in tqdm(range(0,len(id_list)), desc='Extracting features', total=len(id_list)):
-    video = raw_video[int(start_time_list[i]*framerate):int(end_time_list[i]*framerate)]
+    video = raw_video[int(start_time_list[i][0]*framerate):int(end_time_list[i][0]*framerate)]
 
     with th.no_grad():
         input_file = video
         video_id = video_path.split('/')[-1].split('.')[0]+'/'+str(id_list[i])
-        video_id_list.append(video_id)
+        video_id_list.append([video_id])
         asr_string, asr_start, asr_end = ASR_whisper(video_path, segs, i, model_st)
-        asr_string_list.append(asr_string[0])
-        asr_start_list.append(asr_start)
-        asr_end_list.append(asr_end)
+        # add start to asr_start and end to asr_end
+        asr_start = asr_start + start_time_list[i][0]
+        asr_end = asr_end + start_time_list[i][0]
+        # floor the start and end times to the nearest second
+        asr_start = math.floor(asr_start)
+        asr_end = math.floor(asr_end)
+        asr_string_list.append([asr_string[0]])
+        asr_start_list.append([asr_start])
+        asr_end_list.append([asr_end])
         
 
         video = preprocess(video)
@@ -164,7 +170,7 @@ for i in tqdm(range(0,len(id_list)), desc='Extracting features', total=len(id_li
         features = features.cpu().numpy()
         if half_precision:
             features = features.astype("float16")
-        features_list.append(features)
+        features_list.append(features.tolist())
 
 # fill the csv file
 csv_df['video_id'] = video_id_list

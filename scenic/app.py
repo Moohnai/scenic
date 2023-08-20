@@ -53,8 +53,8 @@ FLAGS = flags.FLAGS
 # flags can be accessed via `flags.FLAGS.<flag_name>` and projects can also
 # define their own flags in their `main.py`.
 config_flags.DEFINE_config_file(
-    'config', None, 'Training configuration.', lock_config=True)
-flags.DEFINE_string('workdir', None, 'Work unit directory.')
+    'config', "/home/mona/scenic/scenic/projects/vid2seq/configs/youcook2.py", 'Training configuration.', lock_config=True)
+flags.DEFINE_string('workdir', "./test", 'Work unit directory.')
 flags.DEFINE_string('dataset_service_address', None,
                     'Address of the tf.data service')
 flags.mark_flags_as_required(['config', 'workdir'])
