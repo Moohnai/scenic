@@ -36,7 +36,7 @@ ScalarOrSchedule = Union[float, optax.Schedule]
 
 def get_optimizer(
     optimizer_config: ml_collections.ConfigDict,
-    learning_rate_fn: ScalarOrSchedule,
+    learning_rate_fn: ScalarOrSchedule=1e-3,
     params: Optional[PyTree] = None,
 ) -> optax.GradientTransformation:
   """Constructs the optimizer from the given configuration.
@@ -135,7 +135,7 @@ def get_optimizer(
   # This throws an error when the config has (spelling) mistakes.
   optimizer_fn = getattr(optax, config.optimizer)
   del config.optimizer
-  optax_optimizer = optimizer_fn(learning_rate=learning_rate_fn, **config)
+  optax_optimizer = optimizer_fn(learning_rate=learning_rate_fn, **config.optimizer_configs)
   # Apply to unfrozen weights to prevent change in optimizer state.
   # In turn, this prevents unnecessary gradient calculations.
   if unfreeze_mask:

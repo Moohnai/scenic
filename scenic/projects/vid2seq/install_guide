@@ -1,3 +1,5 @@
+pip install --upgrade "jax[cuda11_pip]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
+
 #
 git clone --branch=main https://github.com/google-research/t5x
 cd t5x
@@ -5,4 +7,16 @@ cd t5x
 python3 -m pip install -e '.[gpu]' -f \
   https://storage.googleapis.com/jax-releases/libtpu_releases.html
 ##
+## install dmvr 
+pip install git+https://github.com/deepmind/dmvr.git
+
+##
+pip install torch==2.0.0+cu118 torchvision==0.15.1+cu118 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu118
+
+
+## install clip
+pip install git+https://github.com/openai/CLIP.git
+## install clu
 pip install clu==0.0.8
+## install tensorflow models
+pip install tf-models-official

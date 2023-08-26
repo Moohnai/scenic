@@ -41,7 +41,7 @@ def get_config(runlocal=''):
   config.dataset_configs.base_dir = '/home/mona/scenic/scenic/projects/vid2seq/data/youcook2/'
   config.dataset_configs.tables = {
       'train': 'train.tfrecord.sst@64',
-      'validation': 'val.tfrecord.sst@64',
+      'validation': 'youcookii_segments_inf@2', #'val.tfrecord.sst@64',
   }
   config.dataset_configs.examples_per_subset = {
       'train': 1333,
@@ -127,7 +127,7 @@ def get_config(runlocal=''):
   config.init_from = ml_collections.ConfigDict()
   # Replace with your checkpoint pretrained on YT-temporal-1bn, assuming it has
   # been trained for 200K iterations
-  config.init_from.checkpoint_path = 'path_to_checkpoint_pretrained_on_yt_temporal_1bn'
+  config.init_from.checkpoint_path = "/home/mona/scenic/scenic/projects/vid2seq/pretrain_models/"
   config.init_from.model_config = 'path_to_yt_temporal_1bn_config'
   config.init_from.step = 200000
 
@@ -147,13 +147,16 @@ def get_config(runlocal=''):
   config.trainer_name = 'densevidcap_trainer'
   config.optimizer = 'adam'
   config.optimizer_configs = ml_collections.ConfigDict()
-  config.optimizer_configs.weight_decay = 0.
+#   config.optimizer_configs.weight_decay = 0.
+  config.optimizer_configs.b1 = 0.9
+  config.optimizer_configs.b2 = 0.999
+  config.optimizer_configs.eps = 1e-8
   config.l2_decay_factor = 0.
   config.max_grad_norm = 1.
   config.label_smoothing = 0.1
   epochs = ml_collections.config_dict.FieldReference(0) #40
   config.num_training_epochs = epochs
-  batch_size = ml_collections.config_dict.FieldReference(32)
+  batch_size = ml_collections.config_dict.FieldReference(5)
   config.batch_size = 8 if runlocal else batch_size  # 128  # Minimum is num_devices = 32
   config.eval_batch_size = 8 if runlocal else 32  # Needs to be num_local_devices
   config.rng_seed = 0

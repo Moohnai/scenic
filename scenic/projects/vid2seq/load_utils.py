@@ -417,12 +417,12 @@ def initialise_from_train_state(
     init_config, model_config = config
 
   # Inspect and compare the parameters of the model with the init-model
-  params = flax.core.unfreeze(train_state.optimizer.target)
+  params = flax.core.unfreeze(train_state.params)
 
   if init_config.get('checkpoint_format', 'scenic') == 'bigvision':
     restored_params = restored_train_state.optimizer['target']
   else:
-    restored_params = restored_train_state.optimizer.target
+    restored_params = restored_train_state.params
   restored_params = flax.core.unfreeze(restored_params)
   for m_key, m_params in restored_params.items():
     if m_key == 'output_projection':
@@ -441,7 +441,7 @@ def initialise_from_train_state(
         assert restored_model_cfg.representation_size
         params[m_key] = m_params
     else:
-      if m_key in train_state.optimizer.target:
+      if m_key in train_state.params:
         params[m_key] = m_params
       else:
         logging.info('Skipping %s. In restored model but not in target',
@@ -451,4 +451,4 @@ def initialise_from_train_state(
     logging.info('Parameter summary after initialising from train state')
     debug_utils.log_param_shapes(params)
   return train_state.replace(
-      optimizer=train_state.optimizer.replace(target=flax.core.freeze(params)))
+      opt_state=train_state.replace(params=flax.core.freeze(params)))

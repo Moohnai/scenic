@@ -12,6 +12,7 @@ scenic/projects/vivit/__pycache__/
 scenic/projects/vivit/data/__pycache__/
 scenic/train_lib/__pycache__/
 build/
+scenic/projects/vid2seq/pretrain_models/checkpoint_200000
 scenic.egg-info/
 scenic/common_lib/__pycache__/
 scenic/projects/vid2seq/configs/__pycache__/

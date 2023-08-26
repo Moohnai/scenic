@@ -308,7 +308,7 @@ def eval_step(
     Calculated metrics and predicted tokens.
   """
   variables = {
-      'params': train_state.optimizer.target,
+      'params': train_state.params,
       **train_state.model_state
   }
   if config.dataset_configs.return_as_dict:
@@ -475,18 +475,22 @@ def init_state(model: base_model.BaseModel, dataset: dataset_utils.Dataset,
   # Create the optimizer.
   # We jit this, such that the arrays that are created are created on the same
   # device as the input is, in this case the CPU. Else they'd be on device[0].
-  optimizer = jax.jit(
-      optimizers.get_optimizer(config).create, backend='cpu')(
-          params)
-  del params  # Do not keep a copy of the initial params.
+  # optimizer = jax.jit(
+  #     optimizers.get_optimizer(config).create, backend='cpu')(
+  #         params)
+  tx = optimizers.get_optimizer(config, 0, params=params)
+  opt_state = jax.jit(tx.init, backend='cpu')(params)
+  # del params  # Do not keep a copy of the initial params.
 
   rng, train_rng = jax.random.split(rng)
   train_state = train_utils.TrainState(
       global_step=0,
-      optimizer=optimizer,
+      opt_state=opt_state,
+      tx=tx,
+      params=params,
       model_state=model_state,
       rng=train_rng,
-      accum_train_time=0)
+      )
   start_step = train_state.global_step
   if config.checkpoint:
     logging.info('Continuing training from the checkpoint')
@@ -511,46 +515,46 @@ def init_state(model: base_model.BaseModel, dataset: dataset_utils.Dataset,
       if config.model.encoder.encoder_type in [
           't5_encoder', 'cat_encoder'
       ] and 'text' in config.dataset_configs.modalities:
-        if 'video_encoder' not in restored_train_state.optimizer.target[
-            'encoder'] and 'video_encoder' in train_state.optimizer.target[
+        if 'video_encoder' not in restored_train_state.params[
+            'encoder'] and 'video_encoder' in train_state.params[
                 'encoder']:
           train_state = load_encoder_params(train_state, config)
-          x = unfreeze(restored_train_state.optimizer.target)
-          x['encoder'] = copy.deepcopy(train_state.optimizer.target['encoder'])
-          optimizer = restored_train_state.optimizer.replace(target=x)
+          x = unfreeze(restored_train_state.params)
+          x['encoder'] = copy.deepcopy(train_state.params['encoder'])
+          opt_state = restored_train_state.opt_state.replace(target=x)
           restored_train_state = restored_train_state.replace(
-              optimizer=optimizer)
+              opt_state=opt_state)
 
-          y = unfreeze(restored_train_state.optimizer.state.param_states)
+          y = unfreeze(restored_train_state.opt_state.state.param_states)
           y['encoder']['video_encoder'] = copy.deepcopy(
-              train_state.optimizer.state.param_states['encoder']
+              train_state.opt_state.state.param_states['encoder']
               ['video_encoder'])
-          state = restored_train_state.optimizer.state.replace(param_states=y)
-          optimizer = restored_train_state.optimizer.replace(state=state)
+          state = restored_train_state.opt_state.state.replace(param_states=y)
+          opt_state = restored_train_state.opt_state.replace(state=state)
           restored_train_state = restored_train_state.replace(
-              optimizer=optimizer)
+              opt_state=opt_state)
 
       # throw away T5 encoder if in checkpoint but not in model
       if config.model.encoder.encoder_type in [
           't5_encoder', 'cat_encoder'
       ] and 'text' not in config.dataset_configs.modalities:
-        if 'video_encoder' in restored_train_state.optimizer.target[
-            'encoder'] and 'video_encoder' not in train_state.optimizer.target[
+        if 'video_encoder' in restored_train_state.params[
+            'encoder'] and 'video_encoder' not in train_state.params[
                 'encoder']:
-          x = unfreeze(restored_train_state.optimizer.target)
+          x = unfreeze(restored_train_state.params)
           if 'encoder' in x and 'video_encoder' in x['encoder']:
             del x['encoder']['video_encoder']
-          optimizer = restored_train_state.optimizer.replace(target=x)
+          opt_state = restored_train_state.opt_state.replace(target=x)
           restored_train_state = restored_train_state.replace(
-              optimizer=optimizer)
+              opt_state=opt_state)
 
-          y = unfreeze(restored_train_state.optimizer.state.param_states)
+          y = unfreeze(restored_train_state.opt_state.state.param_states)
           if 'encoder' in y and 'video_encoder' in y['encoder']:
             del y['encoder']['video_encoder']
-          state = restored_train_state.optimizer.state.replace(param_states=y)
-          optimizer = restored_train_state.optimizer.replace(state=state)
+          state = restored_train_state.opt_state.state.replace(param_states=y)
+          opt_state = restored_train_state.opt_state.replace(state=state)
           restored_train_state = restored_train_state.replace(
-              optimizer=optimizer)
+              opt_state=opt_state)
 
       train_state = load_utils.initialise_from_train_state(
           config,
