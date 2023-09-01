@@ -471,6 +471,14 @@ def init_state(model: base_model.BaseModel, dataset: dataset_utils.Dataset,
        rngs=init_rng)
   logging.info('The model has %d params, uses %d gflops', num_params, gflops or
                -1)
+  
+  from flax import serialization, io
+  checkpoint_path = '/home/mona/scenic/scenic/projects/vid2seq/pretrain_models/checkpoint_200000'
+  with io.GFile(checkpoint_path, 'rb') as fp:
+    checkpoint_contents = fp.read()
+  state_dict_ckpt = serialization.msgpack_restore(checkpoint_contents)
+  params = serialization.from_state_dict(params, state_dict_ckpt['optimizer']['target'])
+  logging.info('The model has restored params from checkpoint %s', checkpoint_path)
 
   # Create the optimizer.
   # We jit this, such that the arrays that are created are created on the same

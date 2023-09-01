@@ -36,7 +36,7 @@ class PTBTokenizer:
       self.ptbtokenizer_jar = ptbtokenizer_jar_path
     else:
       self.ptbtokenizer_jar = os.path.join(
-          "third_party/py/scenic/projects/vid2seq/metrics",
+          "/home/mona/scenic/projects/vid2seq/metrics",
           "stanford-corenlp-3.4.1.jar",
       )
 

@@ -41,11 +41,11 @@ def get_config(runlocal=''):
   config.dataset_configs.base_dir = '/home/mona/scenic/scenic/projects/vid2seq/data/youcook2/'
   config.dataset_configs.tables = {
       'train': 'train.tfrecord.sst@64',
-      'validation': 'youcookii_segments_inf@2', #'val.tfrecord.sst@64',
+      'validation': 'youcookii_1vid_inf@1', #'val.tfrecord.sst@64',
   }
   config.dataset_configs.examples_per_subset = {
       'train': 1333,
-      'validation': 457,
+      'validation': 3, # 457
   }
 
   # List of modalities to load, supports `features` only for now.
@@ -156,7 +156,7 @@ def get_config(runlocal=''):
   config.label_smoothing = 0.1
   epochs = ml_collections.config_dict.FieldReference(0) #40
   config.num_training_epochs = epochs
-  batch_size = ml_collections.config_dict.FieldReference(5)
+  batch_size = ml_collections.config_dict.FieldReference(32)
   config.batch_size = 8 if runlocal else batch_size  # 128  # Minimum is num_devices = 32
   config.eval_batch_size = 8 if runlocal else 32  # Needs to be num_local_devices
   config.rng_seed = 0

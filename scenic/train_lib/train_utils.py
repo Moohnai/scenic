@@ -668,7 +668,7 @@ def restore_checkpoint(
         'a checkpoint without providing a Scenic TrainState.'
     )
   train_state = checkpoints.restore_checkpoint(
-      checkpoint_path, train_state, step
+      checkpoint_path, train_state, step,
   )
   return train_state, int(train_state.global_step)
 

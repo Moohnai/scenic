@@ -25,11 +25,11 @@ import pandas as pd
 import tensorflow as tf
 from tqdm import tqdm
 
-flags.DEFINE_string("csv_path", "/home/mona/scenic/scenic/projects/vid2seq/data/youcook2/youcookii_segments_inf.csv", "Input csv")
+flags.DEFINE_string("csv_path", "/home/mona/scenic/scenic/projects/vid2seq/data/youcook2/youcookii_1vid_inf.csv", "Input csv")
 flags.DEFINE_string("output_path", "/home/mona/scenic/scenic/projects/vid2seq/data/youcook2/", "Tfrecords output path.")
 flags.DEFINE_string(
     "features_path",
-    None,
+    '/home/mona/scenic/scenic/projects/vid2seq/data/youcook2/',
     "In case features are stored in individual files and not in the csv.",
 )
 flags.DEFINE_integer(

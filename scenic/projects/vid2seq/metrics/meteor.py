@@ -30,7 +30,7 @@ class Meteor(object):
       meteor_jar = meteor_jar_path
     else:
       meteor_jar = os.path.join(
-          'third_party/py/scenic/projects/vid2seq/metrics', 'meteor-1.5.jar'
+          '/home/mona/scenic/scenic/projects/vid2seq/metrics', 'meteor-1.5.jar'
       )
 
     assert os.path.exists(meteor_jar), meteor_jar
